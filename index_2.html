@@ -1,0 +1,1084 @@
+<title>Chak De C'ville</title>
+<!--
+  MAINTAINER NOTES (for the Chak De C'ville tech team)
+  ------------------------------------------------------
+  Single self-contained page. Each "page" (Home, About, Board, Event Info,
+  Sponsors, Archive, Charity) is a section shown/hidden by the tiny router
+  at the bottom of this file — nav links use #hash URLs.
+
+  Photos: the hero and About-page photos are real shots pulled from the
+  4.0 site's Show page (trophy celebration + full cast on stage). Swap them
+  by replacing the base64 data in the two `--photo-*` custom properties are
+  NOT used for this — search for "id=\"heroPhoto\"" and "id=\"aboutPhoto\""
+  and swap the <img src="data:..."> for a real hosted file when you have one.
+
+  Logo: no official logo file was supplied, so the badge in the header/
+  footer is a placeholder monogram — search "PLACEHOLDER BADGE" to swap it
+  for an <img src="your-logo.png">.
+
+  Sponsors: the nine university/department logos were pulled from the old
+  site's Sponsors page — real images, already embedded. Red Bull and Milan
+  are listed as text wordmarks since no logo files were provided for them;
+  edit the `sponsors` array in the script to swap in real artwork.
+
+  Add a sponsor: edit the `sponsors` array in the script.
+  Add an archive year: add an entry to `archiveYears` (newest first).
+  Update board members: edit the `board` array.
+-->
+<style>
+  :root {
+    --paper: #f7f3ea;
+    --paper-raised: #ffffff;
+    --ink: #201712;
+    --ink-soft: #5f5148;
+    --ink-faint: #9c8b7c;
+    --red: #a3132b;
+    --red-deep: #6e0e20;
+    --red-bright: #d21f3c;
+    --gold: #c1922c;
+    --gold-soft: #e7c877;
+    --green: #2d6b4f;
+    --blue: #2c5478;
+    --line: rgba(32, 23, 18, 0.12);
+    --shadow: 0 20px 44px -26px rgba(32, 23, 18, 0.5);
+    --radius: 10px;
+    --font-display: "Bebas Neue", "Oswald", Impact, sans-serif;
+    --font-body: "Work Sans", "Segoe UI", system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #17110d;
+      --paper-raised: #221a15;
+      --ink: #f3eade;
+      --ink-soft: #c8b7a6;
+      --ink-faint: #85715f;
+      --red: #e2445c;
+      --red-deep: #b91c2e;
+      --red-bright: #ff5470;
+      --gold: #e3b34e;
+      --gold-soft: #f0d28a;
+      --green: #4c9c78;
+      --blue: #6b98c4;
+      --line: rgba(243, 234, 222, 0.14);
+      --shadow: 0 20px 48px -22px rgba(0, 0, 0, 0.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #17110d;
+    --paper-raised: #221a15;
+    --ink: #f3eade;
+    --ink-soft: #c8b7a6;
+    --ink-faint: #85715f;
+    --red: #e2445c;
+    --red-deep: #b91c2e;
+    --red-bright: #ff5470;
+    --gold: #e3b34e;
+    --gold-soft: #f0d28a;
+    --green: #4c9c78;
+    --blue: #6b98c4;
+    --line: rgba(243, 234, 222, 0.14);
+    --shadow: 0 20px 48px -22px rgba(0, 0, 0, 0.7);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-display);
+    letter-spacing: 0.015em;
+    text-wrap: balance;
+    line-height: 1;
+    font-weight: 400;
+  }
+
+  a { color: inherit; }
+  img { max-width: 100%; display: block; }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+  }
+
+  .wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
+  }
+
+  /* ---------- header ---------- */
+  header.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem clamp(1.25rem, 4vw, 3rem);
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .brand-logo { width: 38px; height: 38px; flex-shrink: 0; object-fit: contain; }
+
+  .brand-word {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+
+  nav.primary-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.7rem;
+  }
+
+  nav.primary-nav a {
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0.4rem 0.05rem;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+  }
+  nav.primary-nav a:hover { color: var(--ink); }
+  nav.primary-nav a[aria-current="page"] {
+    color: var(--red);
+    border-bottom-color: var(--red);
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  @media (max-width: 860px) {
+    nav.primary-nav {
+      position: fixed;
+      inset: 60px 0 0 0;
+      background: var(--paper);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 0.5rem clamp(1.25rem, 4vw, 3rem) 2rem;
+      transform: translateY(-8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      overflow-y: auto;
+      border-top: 1px solid var(--line);
+    }
+    nav.primary-nav.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    nav.primary-nav a { padding: 0.9rem 0.1rem; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+    .menu-toggle { display: inline-flex; }
+  }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border-radius: 3px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-primary { background: var(--gold); color: #241705; border-color: var(--gold); }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-line-light { border-color: rgba(255,255,255,0.65); color: #fff; }
+  .btn-line-light:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+  .btn-outline { border-color: var(--line); color: var(--ink); background: var(--paper-raised); }
+  .btn-outline:hover { border-color: var(--red); color: var(--red); }
+
+  /* ---------- hero (real photo) ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    color: #fbf3e7;
+    background: #1a1210;
+  }
+  .hero img.hero-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+  .hero .scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(20,12,10,0.35) 0%, rgba(20,12,10,0.35) 35%, rgba(16,9,8,0.86) 88%),
+      linear-gradient(90deg, rgba(12,7,6,0.55) 0%, rgba(12,7,6,0.05) 55%);
+  }
+  .hero-inner {
+    position: relative;
+    padding: clamp(4.5rem, 14vw, 8.5rem) 0 clamp(2.6rem, 6vw, 3.6rem);
+  }
+  .hero h1 {
+    font-size: clamp(2.9rem, 8vw, 5.6rem);
+    margin: 0.35rem 0 0.55rem;
+  }
+  .hero .tagline {
+    font-size: clamp(1.02rem, 2vw, 1.25rem);
+    color: #f1ddb8;
+    max-width: 36ch;
+    font-weight: 500;
+  }
+  .hero .date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1.4rem;
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 0.55rem 1rem;
+    border-radius: 3px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-size: 0.88rem;
+  }
+  .hero-ctas { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.8rem; }
+  .hero-logo { width: 74px; height: 74px; object-fit: contain; margin-bottom: 1.1rem; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45)); }
+
+  /* ---------- stat strip ---------- */
+  .stat-strip { background: var(--red-deep); color: #fbf3e7; }
+  .stat-strip .wrap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    padding: 1.8rem clamp(1.25rem, 4vw, 3rem);
+  }
+  .stat-strip .stat { text-align: center; }
+  .stat-strip .stat .num {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    color: var(--gold-soft);
+    line-height: 1;
+  }
+  .stat-strip .stat .label {
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(251,243,231,0.72);
+    margin-top: 0.4rem;
+  }
+  @media (max-width: 700px) { .stat-strip .wrap { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---------- sections ---------- */
+  section.block { padding: clamp(3.2rem, 7vw, 5.5rem) 0; }
+  section.block.tight { padding: clamp(2rem, 5vw, 3rem) 0; }
+  .block-head { max-width: 62ch; margin-bottom: 2.3rem; }
+  .block-head h2 { font-size: clamp(2.1rem, 4.6vw, 3rem); color: var(--ink); margin: 0.35rem 0 0.8rem; }
+  .block-head p { color: var(--ink-soft); font-size: 1.03rem; max-width: 58ch; }
+  .rule { height: 3px; width: 46px; background: var(--red); border-radius: 2px; margin: 0.9rem 0 0; }
+
+  .prose p { max-width: 66ch; color: var(--ink); margin: 0 0 1.1rem; }
+  .prose p.lede { font-size: 1.12rem; color: var(--ink-soft); }
+
+  .two-col { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(2.2rem, 5vw, 3.8rem); align-items: center; }
+  @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; } }
+  .two-col.rev { grid-template-columns: 0.72fr 1.28fr; }
+  @media (max-width: 820px) { .two-col.rev { grid-template-columns: 1fr; } }
+  .two-col.rev .about-photo { width: 100%; max-width: 340px; margin: 0 auto; }
+  @media (max-width: 820px) { .two-col.rev .about-photo { max-width: 300px; } }
+  .two-col .photo-frame { order: 2; }
+  .two-col.rev .photo-frame { order: -1; }
+  @media (max-width: 820px) { .two-col .photo-frame, .two-col.rev .photo-frame { order: -1; } }
+
+  .photo-frame { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); position: relative; }
+  .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+  .card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; }
+
+  .style-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; list-style: none; margin: 1rem 0 0; padding: 0; }
+  @media (max-width: 480px) { .style-list { grid-template-columns: 1fr; } }
+  .style-list li {
+    display: flex; align-items: baseline; gap: 0.6rem;
+    padding: 0.65rem 0.8rem; background: var(--paper-raised);
+    border: 1px solid var(--line); border-radius: 6px; font-weight: 600; font-size: 0.92rem;
+  }
+  .style-list li .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+
+  .mission-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.5rem; }
+  @media (max-width: 700px) { .mission-grid { grid-template-columns: 1fr; } }
+  .mission-grid .card h3 { font-family: var(--font-body); font-weight: 700; font-size: 0.98rem; margin: 0 0 0.4rem; }
+  .mission-grid .card p { font-size: 0.9rem; color: var(--ink-soft); margin: 0; }
+
+  /* ---------- about: style feature (Bollywood Fusion x Indian Classical) ---------- */
+  .style-feature {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+    min-height: 340px;
+  }
+  @media (max-width: 760px) {
+    .style-feature { grid-template-columns: 1fr; min-height: 0; }
+  }
+  .style-half {
+    padding: clamp(2.2rem, 5vw, 3.2rem) clamp(1.5rem, 6vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .style-half.sf-red { background: var(--red-deep); color: #fbf1e2; }
+  .style-half.sf-ink { background: #201712; color: #fbf1e2; }
+  :root[data-theme="light"] .style-half.sf-ink,
+  :root:not([data-theme="dark"]) .style-half.sf-ink { background: #201712; color: #fbf1e2; }
+  .sf-num {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--gold-soft);
+    margin-bottom: 0.6rem;
+  }
+  .style-half h3 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    margin: 0 0 0.7rem;
+    color: #fff;
+  }
+  .style-half p {
+    max-width: 34ch;
+    color: rgba(251,241,226,0.78);
+    font-size: 0.98rem;
+    margin: 0;
+  }
+  .sf-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gold);
+    padding: 0.5rem clamp(1rem, 3vw, 2rem);
+  }
+  .sf-divider span {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    color: #241705;
+  }
+  @media (max-width: 760px) {
+    .sf-divider { padding: 0.6rem 0; }
+  }
+  .style-photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.8rem, 2vw, 1.2rem);
+    margin-top: clamp(0.8rem, 2vw, 1.2rem);
+  }
+  @media (max-width: 760px) {
+    .style-photos { grid-template-columns: 1fr; }
+  }
+  .style-photo { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .style-photo img { display: block; width: 100%; height: 100%; aspect-ratio: 4/3; object-fit: cover; }
+  .style-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .style-photo.sp-ink::after { background: rgb(0, 0, 0); mix-blend-mode: multiply; opacity: 0.55; }
+  .style-photo.sp-ink-light::after { background: rgb(0, 0, 0); mix-blend-mode: multiply; opacity: 0.22; }
+
+  /* ---------- placeholder tiles ---------- */
+  .placeholder-slot {
+    border: 1.5px dashed var(--ink-faint);
+    border-radius: var(--radius);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+    color: var(--ink-faint);
+    background: color-mix(in srgb, var(--paper-raised) 55%, transparent);
+    text-align: center;
+  }
+  .placeholder-slot svg { width: 26px; height: 26px; opacity: 0.65; }
+  .placeholder-slot .ph-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ---------- board ---------- */
+  .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.4rem; }
+  .board-card { text-align: center; }
+  .board-card .avatar { width: 100%; aspect-ratio: 1; margin-bottom: 0.9rem; }
+  .board-card .b-name { font-weight: 700; font-size: 0.98rem; }
+  .board-card .b-role { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--red); font-weight: 700; margin-top: 0.15rem; }
+  .board-card .b-note { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.5rem; font-style: italic; }
+
+  /* ---------- event info ---------- */
+  .info-info-head-wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 clamp(0.75rem, 2.5vw, 1.75rem);
+  }
+  .info-stack {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.2rem, 3vw, 1.8rem);
+  }
+  .info-section {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .info-bg-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .info-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: clamp(1.6rem, 5vw, 3rem) clamp(1.4rem, 4.5vw, 2.6rem) clamp(1.4rem, 4vw, 2rem);
+    background: linear-gradient(180deg, rgba(10,7,6,0) 0%, rgba(10,7,6,0.35) 35%, rgba(9,6,5,0.94) 100%);
+    color: #fbf3e7;
+  }
+  .info-num {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--gold-soft);
+    margin-bottom: 0.4rem;
+  }
+  .info-overlay h3 {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 7vw, 4.6rem);
+    line-height: 0.95;
+    margin: 0 0 0.7rem;
+    color: #fff;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.55);
+  }
+  .info-details { display: flex; gap: clamp(1.4rem, 4vw, 3.2rem); flex-wrap: wrap; }
+  .info-detail { font-weight: 700; font-size: clamp(1rem, 1.8vw, 1.2rem); }
+  .info-detail strong {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 0.25rem;
+  }
+
+  /* ---------- sponsors ---------- */
+  .sponsor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1.1rem; }
+  .sponsor-tile {
+    aspect-ratio: 1; background: var(--paper-raised); border: 1px solid var(--line);
+    border-radius: var(--radius); overflow: hidden; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(20,12,8,0.06);
+  }
+  .sponsor-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sponsor-word { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.02em; color: var(--ink); text-align: center; line-height: 1.05; }
+  .sponsor-word .sub { display: block; font-family: var(--font-body); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; color: var(--ink-faint); text-transform: uppercase; margin-top: 3px; }
+
+  /* ---------- archive ---------- */
+  .archive-year { border-top: 1px solid var(--line); padding: 2.2rem 0; }
+  .archive-year:first-child { border-top: none; }
+  .archive-year-head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.2rem; }
+  .archive-year-head .yr { font-family: var(--font-display); font-size: clamp(2.2rem, 5.5vw, 3rem); color: var(--red); line-height: 1; }
+  .archive-year-head .yr-label { color: var(--ink-soft); font-weight: 600; font-size: 0.92rem; }
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
+  .team-tile { aspect-ratio: 1; }
+
+  .archive-split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 4vw, 3rem); }
+  @media (max-width: 700px) { .archive-split { grid-template-columns: 1fr; } }
+  .archive-col-head {
+    display: flex; align-items: center; gap: 0.55rem;
+    font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-soft); margin-bottom: 0.9rem;
+    padding-bottom: 0.7rem; border-bottom: 1px solid var(--line);
+  }
+  .ac-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ac-fusion .ac-dot { background: var(--red); }
+  .ac-classical .ac-dot { background: var(--blue); }
+  .archive-team-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .archive-team-list li {
+    padding: 0.6rem 0.1rem;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    font-size: 0.94rem;
+  }
+  .archive-team-list li:last-child { border-bottom: none; }
+  .archive-team-list.has-logos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 1.1rem 0.8rem;
+  }
+  .archive-team-list.has-logos li {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 0.5rem; padding: 0; border-bottom: none;
+  }
+  .archive-team-logo {
+    width: 100%; aspect-ratio: 1; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line); box-shadow: 0 3px 10px rgba(20,12,8,0.1);
+    background: #fff;
+  }
+  .archive-team-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .archive-team-list.has-logos li span { font-size: 0.78rem; font-weight: 700; line-height: 1.2; }
+
+  /* ---------- charity ---------- */
+  .charity-hero {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--green);
+    border-radius: var(--radius);
+    padding: clamp(1.6rem, 4vw, 2.6rem);
+  }
+  .value-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+  @media (max-width: 700px) { .value-row { grid-template-columns: 1fr; } }
+  .value-row .card { border-left: 3px solid var(--green); }
+
+  /* ---------- footer ---------- */
+  footer { background: #17110d; color: rgba(247,243,234,0.82); padding: 3rem 0 2rem; margin-top: 2rem; }
+  .footer-top { display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap; align-items: flex-start; }
+  .footer-brand { display: flex; align-items: center; gap: 0.6rem; }
+  .footer-brand .brand-logo { width: 40px; height: 40px; }
+  .footer-brand .brand-word { color: #f7f3ea; }
+  .footer-links { display: flex; gap: 2.5rem; flex-wrap: wrap; }
+  .footer-links h4 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold-soft); margin: 0 0 0.7rem; }
+  .footer-links a { display: block; font-size: 0.86rem; color: rgba(247,243,234,0.72); text-decoration: none; margin-bottom: 0.5rem; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    margin-top: 2.2rem; padding-top: 1.3rem; border-top: 1px solid rgba(247,243,234,0.14);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;
+    font-size: 0.76rem; color: rgba(247,243,234,0.5);
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<header class="site-header">
+  <div class="nav-row">
+    <a href="#home" class="brand">
+      <img class="brand-logo" src="assets/logo/logo-user-provided.png" alt="Chak De C'ville badge">
+      <span class="brand-word">CHAK DE C'VILLE</span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <nav class="primary-nav" id="primaryNav">
+      <a href="#home" data-route="home">Home</a>
+      <a href="#about" data-route="about">About</a>
+      <a href="#board" data-route="board">Board</a>
+      <a href="#event-info" data-route="event-info">Event Info</a>
+      <a href="#sponsors" data-route="sponsors">Partners</a>
+      <a href="#archive" data-route="archive">Archive</a>
+      <a href="#charity" data-route="charity">Charity</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section class="page" id="page-home">
+    <div class="hero">
+      <img class="hero-photo" id="heroPhoto" alt="Chak De C'ville dancers on stage" src="assets/photos/hero-cast.jpg">
+      <div class="scrim"></div>
+      <div class="wrap hero-inner">
+        <img class="hero-logo" src="assets/logo/logo-user-provided.png" alt="Chak De C'ville badge">
+        <p class="eyebrow" style="color: var(--gold-soft);">Fourth Annual Competition</p>
+        <h1>CHAK DE<br>C'VILLE 4.0</h1>
+        <p class="tagline">UVA's Annual Bollywood Fusion and Classical Dance Competition</p>
+        <div class="date-chip">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 6h13M4.5 1v3M11.5 1v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          February 27, 2027
+        </div>
+        <div class="hero-ctas">
+          <a href="#event-info" class="btn btn-primary">Event Info</a>
+          <a href="#about" class="btn btn-line-light">About the Show</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="wrap">
+        <div class="stat"><div class="num">4.0</div><div class="label">This Year's Show</div></div>
+        <div class="stat"><div class="num">6+</div><div class="label">Dance Styles</div></div>
+        <div class="stat"><div class="num">1</div><div class="label">Night, One Stage</div></div>
+        <div class="stat"><div class="num">100%</div><div class="label">Proceeds to Charity</div></div>
+      </div>
+    </div>
+
+    <section class="block">
+      <div class="wrap two-col">
+        <div>
+          <p class="eyebrow">The Competition</p>
+          <h2 style="font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--ink);">Bollywood energy. Classical roots. One stage in Charlottesville.</h2>
+          <div class="rule"></div>
+          <div class="prose" style="margin-top:1.1rem;">
+            <p class="lede">Chak De C'ville is UVA's intercollegiate dance competition celebrating South Asian culture — teams travel in from across the country to battle it out in Bollywood Fusion and Classical styles, with exhibition sets and community performances woven throughout the night.</p>
+            <a href="#about" class="btn btn-outline">Read the full story</a>
+          </div>
+        </div>
+        <div class="photo-frame" style="aspect-ratio: 4/5;">
+          <img src="assets/photos/hero-trophy.jpg" alt="A team celebrates on stage with the competition trophy">
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="charity-hero" style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; justify-content:space-between;">
+          <div>
+            <p class="eyebrow" style="color: var(--green);">Dancing for a Cause</p>
+            <h3 style="font-size: 1.4rem; margin: 0.3rem 0 0.4rem; font-family: var(--font-body); font-weight: 700;">Every ticket supports SAMHIN</h3>
+            <p style="color: var(--ink-soft); max-width: 52ch; margin: 0;">All proceeds beyond covering the cost of the show go to SAMHIN, supporting mental health awareness and resources in the South Asian community.</p>
+          </div>
+          <a href="#charity" class="btn btn-outline">Learn More</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="page" id="page-about" hidden>
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <p class="eyebrow">About</p>
+          <h2>What Is Chak De C'ville?</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="two-col rev">
+          <div class="prose">
+            <p class="lede">Chak De C'ville is a non-profit contracted independent organization (CIO) at the University of Virginia dedicated to promoting awareness of South Asian culture through dance.</p>
+            <p>Every year, we bring intercollegiate teams from across the country to Charlottesville for a single night of competition spanning Bollywood Fusion and Indian Classical dance — sharing traditions, storytelling, and choreography with the UVA community and beyond. Between judged sets, UVA organizations take the stage for exhibition performances, and the whole show is open to the public.</p>
+            <p>What started as Chak De C'ville 1.0 has grown each year — 4.0 is our biggest push yet toward a nationally recognized competition that gives talented collegiate dancers a real platform.</p>
+          </div>
+          <div class="photo-frame about-photo" style="aspect-ratio: 3/4;">
+            <img src="assets/about/carousel/carousel-09.jpg" alt="Partner lift performance">
+          </div>
+        </div>
+
+      </div>
+      <div class="style-feature">
+        <div class="style-half sf-red">
+          <span class="sf-num">01</span>
+          <h3>Bollywood<br>Fusion</h3>
+          <p>High-energy and cinematic — Bollywood choreography blended with hip-hop, contemporary, and everything in between.</p>
+        </div>
+        <div class="sf-divider"><span>&amp;</span></div>
+        <div class="style-half sf-ink">
+          <span class="sf-num">02</span>
+          <h3>Indian<br>Classical</h3>
+          <p>Rooted in tradition — precise footwork, storytelling, and centuries of technique brought to the competition stage.</p>
+        </div>
+      </div>
+      <div class="style-photos">
+        <div class="style-photo sp-ink-light"><img src="assets/about/fusion-photo.jpg" alt="Bollywood Fusion team performing on stage"></div>
+        <div class="style-photo sp-ink"><img src="assets/about/classical-photo.jpg" alt="Indian Classical team performing on stage"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ BOARD ============ -->
+  <section class="page" id="page-board" hidden>
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <p class="eyebrow">The Team</p>
+          <h2>Board</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="board-grid" id="boardGrid"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ EVENT INFO ============ -->
+  <section class="page" id="page-event-info" hidden>
+    <section class="block" style="padding-bottom: 1.6rem;">
+      <div class="info-info-head-wrap">
+        <div class="block-head" style="margin-bottom: 0;">
+          <h2>Event Info</h2>
+          <div class="rule"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="info-stack">
+      <div class="info-section">
+        <img class="info-bg-img" src="assets/event-info/mixer-bg.jpg" alt="Chak De C'ville mixer night">
+        <div class="info-overlay">
+          <span class="info-num">01</span>
+          <h3>Mixer</h3>
+          <div class="info-details">
+            <div class="info-detail"><strong>Location</strong>Newcomb Ballroom</div>
+            <div class="info-detail"><strong>Date</strong>February 26, 2027</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <img class="info-bg-img" src="assets/event-info/show-bg.jpg" alt="Chak De C'ville classical dance team on stage">
+        <div class="info-overlay">
+          <span class="info-num">02</span>
+          <h3>Show</h3>
+          <div class="info-details">
+            <div class="info-detail"><strong>Location</strong>Martin Luther King Jr. Performing Arts Center</div>
+            <div class="info-detail"><strong>Date</strong>February 27, 2027</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <img class="info-bg-img" src="assets/event-info/afterparty-bg.jpg" alt="Chak De C'ville afterparty trophy celebration">
+        <div class="info-overlay">
+          <span class="info-num">03</span>
+          <h3>Afterparty</h3>
+          <div class="info-details">
+            <div class="info-detail"><strong>Location</strong>Rapture</div>
+            <div class="info-detail"><strong>Date</strong>February 27, 2027</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPONSORS ============ -->
+  <section class="page" id="page-sponsors" hidden>
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <p class="eyebrow">Thank You</p>
+          <h2>Partners</h2>
+          <div class="rule"></div>
+          <p>Chak De C'ville runs on the generosity of partners who believe in what we're building. Reach out to chakdecville@gmail to join!</p>
+        </div>
+        <div class="sponsor-grid" id="sponsorGrid"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ ARCHIVE ============ -->
+  <section class="page" id="page-archive" hidden>
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <p class="eyebrow">The Journey So Far</p>
+          <h2>Archive</h2>
+          <div class="rule"></div>
+        </div>
+        <div id="archiveList"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ CHARITY ============ -->
+  <section class="page" id="page-charity" hidden>
+    <section class="block">
+      <div class="wrap">
+        <div class="block-head">
+          <p class="eyebrow">Charity</p>
+          <h2>Samhin</h2>
+          <div class="rule"></div>
+        </div>
+        <div class="two-col rev">
+          <div class="prose">
+            <p class="lede">Every year, Chak De C'ville donates its remaining proceeds — everything left over after covering the cost of the show — to SAMHIN.</p>
+            <p>SAMHIN (the South Asian Mental Health Initiative & Network) works to decrease the stigma and shame around mental illness and connect South Asian Americans with culturally competent care. They serve a community of over 5 million people with roots in India, Pakistan, Sri Lanka, Nepal, Bhutan, Bangladesh, and the Maldives — through free support groups, a helpline, a provider directory, and community education.</p>
+            <p>Learn more, donate, or get involved directly at <a href="https://samhin.org" target="_blank" rel="noopener" style="color:var(--green); font-weight:700;">samhin.org</a>.</p>
+          </div>
+          <div class="photo-frame" style="aspect-ratio: 3/4;">
+            <img src="assets/charity/charity-photo.jpg" alt="Chak De C'ville dancers performing under purple stage lighting">
+          </div>
+        </div>
+        <div class="card" style="border-left: 3px solid var(--green); margin: clamp(1.6rem, 4vw, 2.4rem) auto 0; text-align:center; max-width: 720px;">
+          <img src="assets/logo/samhin-new-logo.png" alt="SAMHIN logo" style="max-width:140px; margin: 0 auto 1.2rem;">
+          <p class="eyebrow" style="color:var(--green);">What SAMHIN Offers</p>
+          <p style="margin-top:0.8rem; text-align:left;"><strong>Support Groups</strong><br><span style="color:var(--ink-soft); font-size:0.92rem;">Free groups including for divorced women, suicide loss survivors, young adults, and grief.</span></p>
+          <p style="text-align:left;"><strong>Helpline</strong><br><span style="color:var(--ink-soft); font-size:0.92rem;">888-581-3230, available 10 AM – 7 PM ET.</span></p>
+          <p style="margin-bottom:0; text-align:left;"><strong>Provider Directory</strong><br><span style="color:var(--ink-soft); font-size:0.92rem;">Connecting people with culturally competent mental health professionals.</span></p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <a href="#home" class="footer-brand">
+        <img class="brand-logo" src="assets/logo/logo-user-provided.png" alt="Chak De C'ville badge">
+        <span class="brand-word">CHAK DE C'VILLE</span>
+      </a>
+      <div class="footer-links">
+        <div>
+          <h4>Explore</h4>
+          <a href="#about">About</a>
+          <a href="#board">Board</a>
+          <a href="#event-info">Event Info</a>
+        </div>
+        <div>
+          <h4>More</h4>
+          <a href="#sponsors">Partners</a>
+          <a href="#archive">Archive</a>
+          <a href="#charity">Charity</a>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <a href="https://instagram.com/chakdecville" target="_blank" rel="noopener">@chakdecville</a>
+          <a href="mailto:chakdecville@gmail.com">chakdecville@gmail.com</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Chak De C'ville · University of Virginia</span>
+      <span>Site built for 4.0 — Feb 27, 2027</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var routes = ['home','about','board','event-info','sponsors','archive','charity'];
+  var titles = {
+    'home': "Chak De C'ville — UVA's Bollywood Fusion & Classical Dance Competition",
+    'about': "About — Chak De C'ville",
+    'board': "Board — Chak De C'ville",
+    'event-info': "Event Info — Chak De C'ville",
+    'sponsors': "Partners — Chak De C'ville",
+    'archive': "Archive — Chak De C'ville",
+    'charity': "Charity — Chak De C'ville"
+  };
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nav = document.getElementById('primaryNav');
+  var toggle = document.getElementById('menuToggle');
+
+  function showRoute(hash) {
+    var id = (hash || '#home').replace('#', '') || 'home';
+    if (routes.indexOf(id) === -1) id = 'home';
+    routes.forEach(function (r) {
+      var el = document.getElementById('page-' + r);
+      if (el) el.hidden = r !== id;
+    });
+    document.querySelectorAll('nav.primary-nav a').forEach(function (a) {
+      if (a.dataset.route === id) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+    document.title = titles[id] || titles.home;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  window.addEventListener('hashchange', function () { showRoute(location.hash); });
+  toggle.addEventListener('click', function () {
+    var open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  function placeholderTile(label, iconType) {
+    var icon = iconType === 'person'
+      ? '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c1.5-4.5 5-6 8-6s6.5 1.5 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="8" cy="8" r="1.6" fill="currentColor"/></svg>';
+    return '<div class="placeholder-slot">' + icon + '<span class="ph-label">' + label + '</span></div>';
+  }
+
+  /* ---------------- board ---------------- */
+  var board = [
+    { name: 'Nithya Muthukumar', role: 'Director' },
+    { name: 'Snigdha Jakka', role: 'Director' },
+    { name: 'Vinith Jayamani', role: 'Director' },
+    { name: 'Arushi Gadicherla', role: 'Logistics' },
+    { name: 'Anvi Kompalli', role: 'Logistics' },
+    { name: 'Jinay Shah', role: 'Hospitality' },
+    { name: 'Vidushi Saravanan', role: 'Hospitality' },
+    { name: 'Arun Karthikeyan', role: 'Treasurer' },
+    { name: 'Sanvi Vandanapu', role: 'Sponsorship' },
+    { name: 'Neha Polavarapu', role: 'Mixer' },
+    { name: 'Shriya Ramaka', role: 'Mixer' },
+    { name: 'Suhaani Singh', role: 'AP' },
+    { name: 'Samanvi Thirunagar', role: 'Tech' },
+    { name: 'Samiksha Gumma', role: 'Tech' },
+    { name: 'Renisha Anthoniz', role: 'Head Liaison' },
+    { name: 'Palak Sanghavi', role: 'Head Liaison' },
+    { name: 'Riya Nippani', role: 'PR' },
+    { name: 'Druthi Ravishankar', role: 'PR' },
+    { name: 'Megha Saikrishnan', role: 'Registration' },
+    { name: 'Dharshini Arun Prakash', role: 'Registration' },
+    { name: 'Deeya Natarajan', role: 'Judging' },
+    { name: 'Aahna Patel', role: 'Judging' },
+    { name: 'Rhea Sethi', role: 'Safety and Wellness' },
+    { name: 'Maanasa Raghavendran', role: 'Senior Advisor' }
+  ];
+  document.getElementById('boardGrid').innerHTML = board.map(function (m) {
+    return '<div class="board-card">' +
+      '<div class="avatar">' + placeholderTile('Photo', 'person') + '</div>' +
+      '<div class="b-name">' + m.name + '</div>' +
+      '<div class="b-role">' + m.role + '</div>' +
+      '</div>';
+  }).join('');
+
+  /* ---------------- sponsors ----------------
+     `img` entries use real logos pulled from the old site's Sponsors page.
+     `word` entries are text wordmarks for sponsors with no logo file yet.
+  ------------------------------------------- */
+  var sponsors = [
+    { img: 'assets/sponsors/red-bull.png', alt: 'Red Bull' },
+    { img: 'assets/sponsors/milan.png', alt: 'Milan Indian Cuisine' },
+    { img: 'assets/sponsors/bodos-bagels.png', alt: "Bodo's Bagels" },
+    { img: 'assets/sponsors/grit-coffee.png', alt: 'Grit Coffee' },
+    { img: 'assets/sponsors/uva-alumni.png', alt: 'UVA Alumni Student Engagement Fund' },
+    { img: 'assets/sponsors/uva-student-council.png', alt: 'UVA Student Council' },
+    { img: 'assets/sponsors/uva-student-affairs.png', alt: 'UVA Student Affairs' },
+    { img: 'assets/sponsors/uva-arts.png', alt: 'UVA Arts' },
+    { img: 'assets/sponsors/uva-parents-program.png', alt: 'UVA Parents Program' },
+    { img: 'assets/sponsors/uva-dei.png', alt: 'Diversity, Equity & Inclusion at UVA' },
+    { img: 'assets/sponsors/uva-mesalc.png', alt: 'UVA Dept. of Middle Eastern & South Asian Languages & Cultures' }
+  ];
+  function sponsorTile(s) {
+    if (s.img) return '<div class="sponsor-tile"><img src="' + s.img + '" alt="' + s.alt + '"></div>';
+    if (s.word) return '<div class="sponsor-tile"><span class="sponsor-word">' + s.word + '<small class="sub">Partner</small></span></div>';
+    return '<div class="sponsor-tile">' + placeholderTile('Your Logo Here', 'image') + '</div>';
+  }
+  document.getElementById('sponsorGrid').innerHTML = sponsors.map(sponsorTile).join('');
+
+  /* ---------------- archive ----------------
+     Add a new year by inserting an object at the TOP of this array, e.g.:
+     { year: '5.0', fusion: ['Team A', 'Team B'], classical: ['Team C'] }
+     Teams are plain names for now — swap a name for { name, logo } and
+     update the render below once real team logos are available.
+  ------------------------------------------- */
+  var archiveYears = [
+    {
+      year: '3.0',
+      fusion: [
+        { name: 'Houston Jannat', logo: 'assets/archive/hj.png' },
+        { name: 'UGA Shikaari', logo: 'assets/archive/shikaari.png' },
+        { name: 'UJhoom', logo: 'assets/archive/ujhoom.png' },
+        { name: 'VT Junoon', logo: 'assets/archive/junoon.jpg' },
+        { name: 'PSU JaDhoom', logo: 'assets/archive/jadhoom.png' },
+        { name: 'MIT Mirchi', logo: 'assets/archive/mirchi.png' },
+        { name: 'WPI Rangeela', logo: 'assets/archive/rangeela.jpg' }
+      ],
+      classical: [
+        { name: 'TAMU Sahithya', logo: 'assets/archive/sahithya.png' },
+        { name: 'Stony Brook Taandava', logo: 'assets/archive/taandava.png' },
+        { name: 'Emory Savera', logo: 'assets/archive/savera.png' },
+        { name: 'BU Dheem', logo: 'assets/archive/dheem.png' },
+        { name: 'NCSU Thandav', logo: 'assets/archive/thandav.png' },
+        { name: 'UNC Ek Taal', logo: 'assets/archive/ektaal.jpg' }
+      ]
+    },
+    {
+      year: '2.0',
+      fusion: [
+        { name: 'USC Moksha', logo: 'assets/archive/moksha.png' },
+        { name: 'Maryland Dhoom', logo: 'assets/archive/mdhoom.png' },
+        { name: 'NU Rangila', logo: 'assets/archive/nurangila.png' },
+        { name: 'Chicago Adaa', logo: 'assets/archive/adaa.png' },
+        { name: 'UAB Rangeela', logo: 'assets/archive/uabrangeela.png' },
+        { name: 'Michigan Taal', logo: 'assets/archive/michtaal.png' },
+        { name: 'GU Guzaarish', logo: 'assets/archive/guzaarish.png' },
+        { name: 'VCU Ishaara', logo: 'assets/archive/ishaara.png' }
+      ],
+      classical: [
+        { name: 'Stony Brook Taandava', logo: 'assets/archive/taandava2.png' },
+        { name: 'JHU Shakti', logo: 'assets/archive/shakti.png' },
+        { name: 'UConn Sankriti', logo: 'assets/archive/sankriti.png' },
+        { name: 'Temple Thaalam', logo: 'assets/archive/thaalam.png' }
+      ]
+    },
+    {
+      year: '1.0',
+      fusion: [
+        { name: 'Case Kismat', logo: 'assets/archive/kismat.png' },
+        { name: 'BU Chankaar', logo: 'assets/archive/chankaar.png' },
+        { name: 'UConn Surya', logo: 'assets/archive/surya.png' },
+        { name: 'Cornell Sitara', logo: 'assets/archive/sitara.png' },
+        { name: 'UMass Jazba', logo: 'assets/archive/jazba.png' },
+        { name: 'Duke Rhydhun', logo: 'assets/archive/rhydhun.png' },
+        { name: 'UW Junoon', logo: 'assets/archive/uwjunoon.png' },
+        { name: 'Wolfpack Junoon', logo: 'assets/archive/wolfjunoon.png' }
+      ],
+      classical: [
+        { name: 'Nrityamala', logo: 'assets/archive/nrityamala.png' },
+        { name: 'UMD Moksha', logo: 'assets/archive/umdmoksha.png' },
+        { name: 'GT Pulse', logo: 'assets/archive/gtpulse.png' },
+        { name: 'JHU Shakti', logo: 'assets/archive/shakti1.png' }
+      ]
+    }
+  ];
+  function teamList(teams) {
+    var hasLogos = teams.some(function (t) { return t && t.logo; });
+    var cls = 'archive-team-list' + (hasLogos ? ' has-logos' : '');
+    return '<ul class="' + cls + '">' + teams.map(function (t) {
+      var name = (t && t.name) ? t.name : t;
+      var logo = (t && t.logo) ? t.logo : null;
+      if (logo) {
+        return '<li><div class="archive-team-logo"><img src="' + logo + '" alt="' + name + ' logo" loading="lazy"></div><span>' + name + '</span></li>';
+      }
+      return '<li>' + name + '</li>';
+    }).join('') + '</ul>';
+  }
+  document.getElementById('archiveList').innerHTML = archiveYears.map(function (y) {
+    return '<div class="archive-year">' +
+      '<div class="archive-year-head"><span class="yr">' + y.year + '</span><span class="yr-label">Competing Teams</span></div>' +
+      '<div class="archive-split">' +
+        '<div class="archive-col ac-fusion"><div class="archive-col-head"><span class="ac-dot"></span>Bollywood Fusion</div>' + teamList(y.fusion) + '</div>' +
+        '<div class="archive-col ac-classical"><div class="archive-col-head"><span class="ac-dot"></span>Classical</div>' + teamList(y.classical) + '</div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+
+  showRoute(location.hash);
+})();
+</script>
