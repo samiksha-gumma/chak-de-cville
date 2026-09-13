@@ -441,7 +441,8 @@
   /* ---------- board ---------- */
   .board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.4rem; }
   .board-card { text-align: center; }
-  .board-card .avatar { width: 100%; aspect-ratio: 1; margin-bottom: 0.9rem; }
+  .board-card .avatar { width: 100%; aspect-ratio: 1; margin-bottom: 0.9rem; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .board-card .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .board-card .b-name { font-weight: 700; font-size: 0.98rem; }
   .board-card .b-role { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--red); font-weight: 700; margin-top: 0.15rem; }
   .board-card .b-note { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.5rem; font-style: italic; }
@@ -934,34 +935,36 @@
 
   /* ---------------- board ---------------- */
   var board = [
-    { name: 'Nithya Muthukumar', role: 'Director' },
-    { name: 'Snigdha Jakka', role: 'Director' },
-    { name: 'Vinith Jayamani', role: 'Director' },
-    { name: 'Arushi Gadicherla', role: 'Logistics' },
-    { name: 'Anvi Kompalli', role: 'Logistics' },
-    { name: 'Jinay Shah', role: 'Hospitality' },
-    { name: 'Vidushi Saravanan', role: 'Hospitality' },
-    { name: 'Arun Karthikeyan', role: 'Treasurer' },
-    { name: 'Sanvi Vandanapu', role: 'Sponsorship' },
-    { name: 'Neha Polavarapu', role: 'Mixer' },
-    { name: 'Shriya Ramaka', role: 'Mixer' },
-    { name: 'Suhaani Singh', role: 'AP' },
-    { name: 'Samanvi Thirunagar', role: 'Tech' },
-    { name: 'Samiksha Gumma', role: 'Tech' },
-    { name: 'Renisha Anthoniz', role: 'Head Liaison' },
-    { name: 'Palak Sanghavi', role: 'Head Liaison' },
-    { name: 'Riya Nippani', role: 'PR' },
-    { name: 'Druthi Ravishankar', role: 'PR' },
-    { name: 'Megha Saikrishnan', role: 'Registration' },
-    { name: 'Dharshini Arun Prakash', role: 'Registration' },
-    { name: 'Deeya Natarajan', role: 'Judging' },
-    { name: 'Aahna Patel', role: 'Judging' },
-    { name: 'Rhea Sethi', role: 'Safety and Wellness' },
-    { name: 'Maanasa Raghavendran', role: 'Senior Advisor' }
+    { name: 'Nithya Muthukumar', role: 'Director', img: 'assets/board/nithya.jpg' },
+    { name: 'Snigdha Jakka', role: 'Director', img: 'assets/board/snigdha.jpg' },
+    { name: 'Vinith Jayamani', role: 'Director', img: 'assets/board/vinith.jpg' },
+    { name: 'Arushi Gadicherla', role: 'Logistics', img: 'assets/board/arushi.jpg' },
+    { name: 'Anvi Kompalli', role: 'Logistics', img: 'assets/board/anvi.jpg' },
+    { name: 'Jinay Shah', role: 'Hospitality', img: 'assets/board/jinay.jpg' },
+    { name: 'Vidushi Saravanan', role: 'Hospitality', img: 'assets/board/vidushi.jpg' },
+    { name: 'Sanvi Vandanapu', role: 'Sponsorship', img: 'assets/board/sanvi.jpg' },
+    { name: 'Neha Polavarapu', role: 'Mixer', img: 'assets/board/neha.jpg' },
+    { name: 'Shriya Ramaka', role: 'Mixer', img: 'assets/board/shriya.jpg' },
+    { name: 'Suhaani Singh', role: 'AP', img: 'assets/board/suhaani.jpg' },
+    { name: 'Samanvi Thirunagar', role: 'Tech', img: 'assets/board/samanvi.jpg' },
+    { name: 'Samiksha Gumma', role: 'Tech', img: 'assets/board/samiksha.jpg' },
+    { name: 'Renisha Anthoniz', role: 'Head Liaison', img: 'assets/board/renisha.jpg' },
+    { name: 'Palak Sanghavi', role: 'Head Liaison', img: 'assets/board/palak.jpg' },
+    { name: 'Riya Nippani', role: 'PR', img: 'assets/board/riya.jpg' },
+    { name: 'Druthi Ravishankar', role: 'PR', img: 'assets/board/druthi.jpg' },
+    { name: 'Megha Saikrishnan', role: 'Registration', img: 'assets/board/megha.jpg' },
+    { name: 'Dharshini Arun Prakash', role: 'Registration', img: 'assets/board/dharshini.jpg' },
+    { name: 'Deeya Natarajan', role: 'Judging', img: 'assets/board/deeya.jpg' },
+    { name: 'Aahna Patel', role: 'Judging', img: 'assets/board/aahna.jpg' },
+    { name: 'Rhea Sethi', role: 'Safety and Wellness', img: 'assets/board/rhea.jpg' },
+    { name: 'Maanasa Raghavendran', role: 'Senior Advisor', img: 'assets/board/maanasa.jpg' }
   ];
   document.getElementById('boardGrid').innerHTML = board.map(function (m) {
+    var avatar = m.img
+      ? '<img src="' + m.img + '" alt="' + m.name + '">'
+      : placeholderTile('Photo', 'person');
     return '<div class="board-card">' +
-      '<div class="avatar">' + placeholderTile('Photo', 'person') + '</div>' +
+      '<div class="avatar">' + avatar + '</div>' +
       '<div class="b-name">' + m.name + '</div>' +
       '<div class="b-role">' + m.role + '</div>' +
       '</div>';
