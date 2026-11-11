@@ -621,9 +621,93 @@
       <a href="#sponsors" data-route="sponsors">Partners</a>
       <a href="#archive" data-route="archive">Archive</a>
       <a href="#charity" data-route="charity">Charity</a>
+      <a href="#donate" data-route="donate">Donate</a>
     </nav>
   </div>
 </header>
+
+<!-- ============ DONATE ============ -->
+<section class="page" id="page-donate" hidden>
+  <section class="block">
+    <div class="wrap">
+
+      <div class="block-head">
+        <p class="eyebrow">Support Us</p>
+        <h2>Donate</h2>
+        <div class="rule"></div>
+      </div>
+
+      <div class="card" style="
+        max-width: 850px;
+        margin: 0 auto;
+        padding: clamp(2rem, 5vw, 4rem);
+        text-align: center;
+      ">
+
+        <p class="eyebrow">Chak De C'ville 4.0</p>
+
+        <h2 style="
+          font-size: clamp(2.4rem, 6vw, 4rem);
+          margin: 0.6rem 0 1.4rem;
+          color: var(--ink);
+        ">
+          HELP US MAKE IT HAPPEN
+        </h2>
+
+        <p style="
+          color: var(--ink-soft);
+          font-size: 1.08rem;
+          max-width: 58ch;
+          margin: 0 auto 1.5rem;
+          line-height: 1.8;
+        ">
+          Chak De C'ville brings together talented
+          collegiate dancers from across the country
+          to celebrate South Asian culture through
+          Bollywood Fusion and Indian Classical dance.
+        </p>
+
+        <p style="
+          color: var(--ink-soft);
+          font-size: 1rem;
+          max-width: 54ch;
+          margin: 0 auto 2.2rem;
+          line-height: 1.8;
+        ">
+          Every contribution makes a difference.
+          Visit our GoFundMe to learn more about
+          our fundraiser and support Chak De C'ville 4.0!
+        </p>
+
+        <a
+          href="https://gofund.me/3fd7e5762"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-primary"
+          style="
+            font-size: 1rem;
+            padding: 1.1rem 2.5rem;
+            display: inline-flex;
+            justify-content: center;
+          "
+        >
+          DONATE ON GOFUNDME ↗
+        </a>
+
+        <p style="
+          margin-top: 1.5rem;
+          font-size: 0.82rem;
+          color: var(--ink-faint);
+        ">
+          You will be redirected to GoFundMe
+          to make your contribution.
+        </p>
+
+      </div>
+
+    </div>
+  </section>
+</section>
 
 <main>
 
@@ -873,6 +957,7 @@
           <a href="#sponsors">Partners</a>
           <a href="#archive">Archive</a>
           <a href="#charity">Charity</a>
+          <a href="#donate">Donate</a>
         </div>
         <div>
           <h4>Connect</h4>
@@ -891,7 +976,7 @@
 
 <script>
 (function () {
-  var routes = ['home','about','board','event-info','sponsors','archive','charity'];
+  var routes = ['home','about','board','event-info','sponsors','archive','charity','donate'];
   var titles = {
     'home': "Chak De C'ville — UVA's Bollywood Fusion & Classical Dance Competition",
     'about': "About — Chak De C'ville",
@@ -899,7 +984,8 @@
     'event-info': "Event Info — Chak De C'ville",
     'sponsors': "Partners — Chak De C'ville",
     'archive': "Archive — Chak De C'ville",
-    'charity': "Charity — Chak De C'ville"
+    'charity': "Charity — Chak De C'ville",
+    'donate': "Donate — Chak De C'ville"
   };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var nav = document.getElementById('primaryNav');
